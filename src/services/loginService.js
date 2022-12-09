@@ -9,16 +9,28 @@ module.exports = {
             if (rows.length > 0) {
                 let user = rows[0]
                 if (await bcrypt.compare(password, user.password)) {
-                    return { auth: true }
+                    return { auth: true, email: user.email }
                 }
             }
             return { auth: false }
         } catch (err) {
-            return { message: 'There was an error while trying to auth user information.', err }
+            throw err;
         }
     },
 
-    getTokenJWT: () => {
+    getTokenJWT: (...data) => {
+        const jwt = require('jsonwebtoken')
+        const dotenv = require('dotenv')
+        dotenv.config({ path: '.env' })
 
+        let token = jwt.sign(
+            { data },
+            process.env.JWT_KEY,
+            {
+                expiresIn: "1h"
+            }
+        );
+
+        return token;
     }
 }
